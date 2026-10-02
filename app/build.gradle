@@ -1,0 +1,30 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.ys.foods'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.ys.foods"
+        minSdk 19          // Android 4.4 KitKat
+        targetSdk 34
+        versionCode 1
+        versionName "1.1-api19"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    lint {
+        abortOnError false
+    }
+}
+// No dependencies on purpose: platform classes only, so nothing requires API > 19.
