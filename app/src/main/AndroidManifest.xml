@@ -4,8 +4,6 @@
     <!-- No permissions: the app is fully offline (links open in the browser). -->
     <application
         android:allowBackup="false"
-        android:icon="@mipmap/ic_launcher"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:label="לוח ברכות"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Holo.NoActionBar">
