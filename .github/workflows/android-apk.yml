@@ -30,11 +30,8 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
         with:
-          # Do not install the removed legacy "tools" package (causes SDK setup to fail).
-          packages: |
-            platform-tools
-            platforms;android-34
-            build-tools;34.0.0
+          # Use space-separated package IDs; this action treats the whole input as space-delimited.
+          packages: platform-tools platforms;android-34 build-tools;34.0.0
 
       - name: Verify required app assets
         run: |
