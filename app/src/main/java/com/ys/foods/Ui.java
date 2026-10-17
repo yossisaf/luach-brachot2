@@ -6,19 +6,18 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.PowerManager;
 
-/** Resolved theme (day/night/auto, accent color, text scale) - same options as the original app. */
+/** Lightweight design system built only from Android views available on API 19+. */
 final class Ui {
-    /** color_option 0..5, same Material colors the original used. */
-    static final int[] PALETTE = {0xFF673AB7, 0xFF2196F3, 0xFF4CAF50, 0xFFF44336, 0xFF3F51B5, 0xFF607D8B};
-    static final String[] PALETTE_NAMES = {"סגול", "כחול", "ירוק", "אדום", "אינדיגו", "אפור-כחול"};
-    /** text_size_option 0..2 = קטן / בינוני / גדול (multipliers are an approximation). */
-    static final float[] SCALES = {0.85f, 1.0f, 1.2f};
+    static final int[] PALETTE = {
+            0xFF176B87, 0xFF4056A1, 0xFF16806A, 0xFFB95C43, 0xFF7356A8, 0xFF536579
+    };
+    static final String[] PALETTE_NAMES = {"כחול-טורקיז", "כחול", "ירוק", "טרה-קוטה", "סגול", "אפור-כחול"};
+    static final float[] SCALES = {0.90f, 1.0f, 1.18f};
 
     final Context ctx;
     final boolean dark;
-    final int primary;
+    final int primary, primarySoft, bg, card, fg, sub, field, line, header, hl;
     final float scale;
-    final int bg, fg, sub, field, header, hl;
 
     Ui(Context c, Prefs p) {
         ctx = c;
@@ -29,15 +28,18 @@ final class Ui {
 
         int co = p.colorOption();
         primary = PALETTE[(co >= 0 && co < PALETTE.length) ? co : 0];
+        primarySoft = blend(primary, dark ? 0xFF101722 : 0xFFF5F9FC, dark ? 0.72f : 0.88f);
         int ts = p.textSize();
         scale = SCALES[(ts >= 0 && ts < SCALES.length) ? ts : 1];
 
-        bg = dark ? 0xFF121212 : 0xFFFFFFFF;
-        fg = dark ? 0xFFEEEEEE : 0xFF111111;
-        sub = dark ? 0xFFAAAAAA : 0xFF555555;
-        field = dark ? 0xFF1E1E1E : 0xFFF2F2F2;
-        header = dark ? blend(primary, 0xFF000000, 0.45f) : primary;
-        hl = withAlpha(primary, dark ? 0xA0 : 0x70); // focus highlight (drawn on top of rows)
+        bg = dark ? 0xFF101722 : 0xFFF4F7FB;
+        card = dark ? 0xFF1B2635 : 0xFFFFFFFF;
+        fg = dark ? 0xFFF3F6FA : 0xFF1C2938;
+        sub = dark ? 0xFFAAB7C7 : 0xFF657487;
+        field = dark ? 0xFF202C3B : 0xFFFFFFFF;
+        line = dark ? 0xFF334153 : 0xFFE2E8EF;
+        header = card;
+        hl = withAlpha(primary, dark ? 0x44 : 0x22);
     }
 
     private static boolean systemNight(Context c) {
@@ -53,12 +55,18 @@ final class Ui {
         return false;
     }
 
-    /** Tint of a board's rows (the original colors boards differently). */
     int accent(String category) {
-        if ("hanenin".equals(category)) return dark ? 0xFF283593 : 0xFFC5CAE9;
-        if ("reach".equals(category)) return dark ? 0xFF2E7D32 : 0xFFC8E6C9;
-        if ("tolahim".equals(category)) return dark ? 0xFFC62828 : 0xFFFFCDD2;
-        return 0x00000000;
+        if ("hanenin".equals(category)) return primary;
+        if ("reach".equals(category)) return dark ? 0xFF72B7A4 : 0xFF16806A;
+        if ("tolahim".equals(category)) return dark ? 0xFFE6A18E : 0xFFB95C43;
+        return primary;
+    }
+
+    String categoryTitle(String category) {
+        if ("hanenin".equals(category)) return "ברכות הנהנין";
+        if ("reach".equals(category)) return "ברכות הריח";
+        if ("tolahim".equals(category)) return "שהחיינו ותולעים";
+        return "מאגר הברכות";
     }
 
     int dp(int v) {
