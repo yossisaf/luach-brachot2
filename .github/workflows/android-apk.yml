@@ -12,7 +12,7 @@ on:
       - '.github/workflows/android-apk.yml'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -36,6 +36,18 @@ jobs:
             platforms;android-34
             build-tools;34.0.0
 
+      - name: Verify required app assets
+        run: |
+          set -eu
+          test -s app/src/main/assets/blessings.txt
+          test -s app/src/main/assets/smell.txt
+          test -s app/src/main/assets/shehechiyanu.txt
+          test -s app/src/main/assets/notice_hanenin.txt
+          test -s app/src/main/assets/notice_tolahim.txt
+          test -s app/src/main/assets/fonts/LiberationSans-Regular.ttf
+          test -s app/src/main/assets/fonts/LiberationSans-Bold.ttf
+          grep -Eq 'minSdk[[:space:]]+19' app/build.gradle
+
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
@@ -43,6 +55,25 @@ jobs:
 
       - name: Build debug APK
         run: gradle --no-daemon clean assembleDebug
+
+      - name: Verify Android 4.4 compatibility and prepare direct download
+        run: |
+          set -eu
+          APK=app/build/outputs/apk/debug/app-debug.apk
+          test -s "$APK"
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$APK" | grep -q "sdkVersion:'19'"
+          cp "$APK" luach-brachot-debug.apk
+
+      - name: Publish direct APK download
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: android44-build-${{ github.run_number }}
+          name: Luach Brachot APK — Android 4.4+
+          body: |
+            Automatically built debug APK. Minimum Android version: 4.4 (API 19).
+            The APK is debug-signed by the Android build system.
+          files: luach-brachot-debug.apk
+          make_latest: true
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
